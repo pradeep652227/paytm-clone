@@ -8,10 +8,8 @@
     "dev": "npx tsc -b && node dist/server.js",
     "start": "node dist/server.js",
     "build": "npx tsc -b",
-    "start-dev": "concurrently \"npm run watch\" \"npm run serve\"",
-    "watch": "tsc -w",
-    "serve": "nodemon"
-
+    "start-dev": "concurrently \"npm run build\" \"npm run watch\" \"npm run start\"",
+    "watch": "tsc -w"
   },
   "keywords": [],
   "author": "",
@@ -26,9 +24,11 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.9",
     "concurrently": "^9.1.2",
+    "cors": "^2.8.5",
     "nodemon": "^3.1.9",
     "typescript": "^5.7.3"
   }

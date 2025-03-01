@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { helpers as Helpers, customTypes as CustomTypes, zodSchemas, zodTypes } from '../utils/index';
-import User from '../models/User';
+import { User, Account } from '../models/index';
 import config from '../config/config';
 import { z } from 'zod';
 const { userSignupSchema, userSigninSchema } = zodSchemas;
@@ -13,7 +13,6 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
         const parseResult = userSignupSchema.safeParse(req.body);
 
-
         if (!parseResult.success)
             throw new CustomTypes.CustomError('Invalid request body', 400, parseResult.error);
 
@@ -23,15 +22,25 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
         const newUser = await User.create({
             username: req.body.username,
             email: req.body.email,
-            password: hashedPassword
+            password: hashedPassword,
+            firstName: req.body.firstName,
         });
 
         if (!newUser)
-            throw new CustomTypes.CustomError('User creation failed', 500, null);
+            throw new CustomTypes.CustomError('User creation failed', 400, null);
+
+        //give a random balance to user from 1 to 10000
+        const userBalance = Math.floor(Math.random() * 10000 + 1);
+        const userAccount = await Account.create({
+            User: newUser._id,
+            balance: userBalance
+        });
+        if (!userAccount)
+            throw new CustomTypes.CustomError('User balance addition failed', 400, null);
 
         res.setHeader('location', `/api/v1/user/${newUser._id}`);
         return res.status(200)
-            .json(Helpers.response(true, 'User signed up successfully!!', newUser, null));
+            .json(Helpers.response(true, 'User signed up successfully!!', { user: newUser, balance: userAccount.balance }, null));
     } catch (error: any) {
         console.log('error in signup ', error);
         return res.status(error.status || 500)

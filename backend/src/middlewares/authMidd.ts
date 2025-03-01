@@ -27,7 +27,7 @@ export default async function (req: customTypes.AuthenticatedRequest, res: Respo
                     resolve(decodedInfo);
                 });
 
-            } else if (baseUrl.includes('user')) {
+            } else if (baseUrl.includes('user') || baseUrl.includes('account')) {
                 //User token verification
                 jwt.verify(token, config.SECRET, (err: any, decodedInfo: any) => {
                     if (err || decodedInfo.role !== 'user')

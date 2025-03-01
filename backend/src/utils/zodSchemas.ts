@@ -7,6 +7,8 @@ export const userSignupSchema = z.object({
     username: z.string().min(3).max(255),
     email: z.string().min(3).email(),
     password: z.string().min(6).max(255),
+    firstName: z.string().min(3).max(255),
+    lastName: z.string().min(3).max(255).optional(),
 }).superRefine((data, ctx) => {
     const password = data.password;
     const errors = [];
@@ -43,5 +45,9 @@ export const userSigninSchema = z.object({
 export const UserSchema = z.object({
     username: z.string(),
     email: z.string().email(),
-    password: z.string()
+    password: z.string(),
+    firstName: z.string(),
+    lastName: z.string().optional(),
+    createdAt : z.date().optional(),
+    updatedAt : z.date().optional(),
 });
