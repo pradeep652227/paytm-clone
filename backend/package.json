@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "build": "npx tsc -b",
     "start-dev": "concurrently \"npm run build\" \"npm run watch\" \"npm run start\"",
+    "start-dev-clean": "rmdir dist -f & concurrently \"npm run build\" \"npm run watch\" \"npm run start\"",
     "watch": "tsc -w"
   },
   "keywords": [],

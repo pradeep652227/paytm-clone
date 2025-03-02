@@ -16,3 +16,18 @@ export interface AuthenticatedRequest extends Request {
     role?: string;
 }
 
+export enum TxnTypes {
+    CREDIT = 'C',
+    DEBIT = 'D'
+}
+
+export enum RequestStatus {
+    PENDING = 'P',
+    SUCCESS = 'S',
+    FAILURE = 'F'
+}
+
+export enum TxnModes {
+    RANDOM = 'RANDOM BALANCE',
+    TRANSFER = 'TRANSFER'
+}

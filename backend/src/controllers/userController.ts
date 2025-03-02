@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { helpers as Helpers, customTypes as CustomTypes, zodSchemas, zodTypes } from '../utils/index';
-import { User, Account } from '../models/index';
+import { helpers as Helpers, customTypes as CustomTypes, zodSchemas, zodTypes, customTypes } from '../utils/index';
+import { User, Account, Transaction } from '../models/index';
 import config from '../config/config';
 import { z } from 'zod';
 const { userSignupSchema, userSigninSchema } = zodSchemas;
@@ -31,6 +31,19 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
         //give a random balance to user from 1 to 10000
         const userBalance = Math.floor(Math.random() * 10000 + 1);
+
+        //create a transaction for the random balance given to the user
+        await Transaction.create({
+            User : newUser._id,
+            amount : userBalance,
+            txnType : customTypes.TxnTypes.CREDIT,
+            txnMode : customTypes.TxnModes.RANDOM,
+            currentBalance : 0,
+            updatedBalance : userBalance,
+            status : customTypes.RequestStatus.SUCCESS,
+            remarks : 'Random Balance on signup!!'
+        });
+
         const userAccount = await Account.create({
             User: newUser._id,
             balance: userBalance

@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import mongoose from 'mongoose';
 
-import Account from '../models/Account';
+import { Account, Transaction } from '../models/index';
 import { customTypes as CustomTypes, helpers as Helpers } from '../utils/index';
 
 export const GetBalance = async (req: CustomTypes.AuthenticatedRequest, res: Response): Promise<any> => {
@@ -20,7 +20,6 @@ export const GetBalance = async (req: CustomTypes.AuthenticatedRequest, res: Res
     }
 }
 
-
 export const Transfer = async (req: CustomTypes.AuthenticatedRequest, res: Response): Promise<any> => {
     const session = await mongoose.startSession();
     try {
@@ -36,7 +35,7 @@ export const Transfer = async (req: CustomTypes.AuthenticatedRequest, res: Respo
         if (!fromAccount)
             throw new CustomTypes.CustomError('Account not found', 404, null);
 
-        //check if the user has required balance
+        // Check if the user has required balance
         if (fromAccount.balance < amount)
             throw new CustomTypes.CustomError('Insufficient balance!!', 400, null);
 
@@ -44,25 +43,59 @@ export const Transfer = async (req: CustomTypes.AuthenticatedRequest, res: Respo
         if (!toAccount)
             throw new CustomTypes.CustomError('Receiver account not found', 404, null);
 
-        //Transfer amount logic
-        fromAccount.balance -= amount;
-        await fromAccount.save({session});
-        
-        toAccount.balance += amount;
-        await toAccount.save({session});
+        // **Manually create transaction documents, then save them**
+        const fromAccountTransaction = new Transaction({
+            User: fromAccount.User,
+            amount: amount,
+            currentBalance: fromAccount.balance,
+            txnType: CustomTypes.TxnTypes.DEBIT
+        });
+        fromAccountTransaction.$session(session);
 
+        const toAccountTransaction = new Transaction({
+            User: toAccount.User,
+            amount: amount,
+            currentBalance: toAccount.balance,
+            txnType: CustomTypes.TxnTypes.CREDIT
+        });
+        toAccountTransaction.$session(session);// ✅ Bind session
+
+        // Save transactions inside the session
+        await fromAccountTransaction.save({ session });
+        await toAccountTransaction.save({ session });
+
+        // **Update account balances**
+        fromAccount.balance -= amount;
+        await fromAccount.save({ session });
+
+        toAccount.balance += amount;
+        await toAccount.save({ session });
+
+        // **Update transaction status and final balance**
+        fromAccountTransaction.status = CustomTypes.RequestStatus.SUCCESS;
+        fromAccountTransaction.updatedBalance = fromAccount.balance;
+        await fromAccountTransaction.save({ session });
+
+        toAccountTransaction.status = CustomTypes.RequestStatus.SUCCESS;
+        toAccountTransaction.updatedBalance = toAccount.balance;
+        await toAccountTransaction.save({ session });
+
+        console.log('fromAccountTransaction ', fromAccountTransaction);
+        
+        // Commit transaction
         await session.commitTransaction();
         return res.status(200)
             .json(Helpers.response(true, 'Amount transferred successfully!!', { balance: fromAccount.balance }, null));
     } catch (error: any) {
         await session.abortTransaction();
-        console.log('error in transfer ', error);
+        console.log('Error in transfer:', error);
         return res.status(error.status || 500)
             .json(Helpers.response(false, error?.message || 'Internal server error', null, error || null));
     } finally {
         session.endSession();
     }
 };
+
 
 
 // export const Transfer = async (req: any): Promise<any> => {
