@@ -4,7 +4,10 @@ export default function Button({
   type = "submit",
   className = "",
   props,
-}) {
+})
+{
+  console.log(`${label} Button is rendered`);
+
   return (
     <button
       type={type}

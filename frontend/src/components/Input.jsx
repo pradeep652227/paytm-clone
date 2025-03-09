@@ -13,7 +13,7 @@ export default function Input({
   const uniqueId = useId();
 
   const inputId = id || Math.random() * 6 + 1 + "-" + uniqueId;
-
+  console.log(`${label} Input is rendered`);
   return (
     <div className="flex flex-col">
       {label && (
