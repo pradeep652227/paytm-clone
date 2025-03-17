@@ -3,7 +3,7 @@ export default function Button({
   label = "Submit",
   type = "submit",
   className = "",
-  props,
+  ...props
 })
 {
   console.log(`${label} Button is rendered`);

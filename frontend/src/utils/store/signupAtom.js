@@ -11,10 +11,15 @@ export const formDataAtom = atom({
   }
 });
 
+// Instead of using formDataAtom directly, handle each field separately
 export const formFieldSelectorFamily = selectorFamily({
   key: "formFieldSelector",
-  get: (fieldName) => ({ get }) => get(formDataAtom)[fieldName],
+  get: (fieldName) => ({ get }) => get(formDataAtom)[fieldName],  // Get single field value
   set: (fieldName) => ({ set }, newValue) => {
-    set(formDataAtom, (prevState) => ({ ...prevState, [fieldName]: newValue }))
-  }
-})
+    set(formDataAtom, (prevState) => {
+      // Only update the changed field, preventing unnecessary re-renders
+      if (prevState[fieldName] === newValue) return prevState;
+      return { ...prevState, [fieldName]: newValue };
+    });
+  },
+});
