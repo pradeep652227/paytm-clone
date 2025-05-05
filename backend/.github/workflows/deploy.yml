@@ -31,4 +31,4 @@ jobs:
         key: ${{ secrets.EC2_FIRST_SETUP_SECRET }}
         script: |
           cd /paytm-clone/backend
-          ls
+          ls -la
