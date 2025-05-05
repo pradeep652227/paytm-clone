@@ -32,5 +32,12 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: ./scripts/deploy.sh
-          
+          script: |
+                export NVM_DIR="$HOME/.nvm"
+                source "$NVM_DIR/nvm.sh"
+                nvm use 22.15.0 
+                
+                npm install
+                npm run build
+                pm2 restart paytm-clone || pm2 start dist/server.js --name paytm-clone-backend
+                pm2 save
