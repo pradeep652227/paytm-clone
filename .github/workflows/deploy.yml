@@ -18,19 +18,20 @@ jobs:
           node-version: "18" # or your version
 
       - name: Install dependencies
-  run: |
-    cd backend
-    npm ci
-# ...
-    # - name: Run tests
-    #   run: npm test  # skip this if you don't have tests
+        run: |
+          cd backend
+          npm ci
 
-    - name: Deploy to EC2 via SSH
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_FIRST_SETUP_SECRET }}
-        script: |
-          cd /paytm-clone/backend
-          ls -la
+      # Uncomment the following step if you have tests
+      # - name: Run tests
+      #   run: npm test
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_FIRST_SETUP_SECRET }}
+          script: |
+            cd /paytm-clone/backend
+            ls -la
