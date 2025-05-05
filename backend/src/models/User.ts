@@ -6,6 +6,7 @@ export interface IUser extends mongoose.Document {
     password: string;
     firstName: string;
     lastName: string;
+    profilePic : string;
 }
 
 const UserSchema = new mongoose.Schema({
@@ -31,6 +32,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    profilePic : {
+        type : String,
+        default : ""
+    }
 }, { timestamps: true });
 
 export default mongoose.model<IUser>("User", UserSchema);

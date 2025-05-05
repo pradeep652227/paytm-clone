@@ -5,20 +5,24 @@ import config from '../config/config';
 
 export default async function (req: customTypes.AuthenticatedRequest, res: Response, next: NextFunction) {
     try {
-        const authorizationHeader = req.headers['authorization'];
+        let isCookieEnabled = false;
+        if(req.cookies?.token)
+            isCookieEnabled = true;
+
+        const authorizationHeader = req.cookies?.token || req.headers['authorization'] ;
 
         if (!authorizationHeader) {
             throw new customTypes.CustomError('Unauthorized', 401, 'Authorization header is missing');
         }
 
-        const token = authorizationHeader.split(' ')[1];
+        const token = isCookieEnabled ? authorizationHeader : authorizationHeader.split(' ')[1];
         if (!token) {
             throw new customTypes.CustomError('Unauthorized', 401, 'Token is missing');
         }
 
         const baseUrl = req.baseUrl;
 
-        const decodedInfo : decodedInfoType = await new Promise((resolve, reject) => {
+        const decodedInfo: decodedInfoType = await new Promise((resolve, reject) => {
             if (baseUrl.includes('admin')) {
                 //Admin token verification
                 jwt.verify(token, config.SECRET_ADMIN, (err: any, decodedInfo: any) => {
@@ -28,6 +32,7 @@ export default async function (req: customTypes.AuthenticatedRequest, res: Respo
                 });
 
             } else if (baseUrl.includes('user') || baseUrl.includes('account')) {
+
                 //User token verification
                 jwt.verify(token, config.SECRET, (err: any, decodedInfo: any) => {
                     if (err || decodedInfo.role !== 'user')

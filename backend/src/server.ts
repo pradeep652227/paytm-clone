@@ -1,20 +1,28 @@
 import { Request, Response, NextFunction } from "express";
 const express = require("express");
 import cors from "cors";
+import cookieParser from 'cookie-parser';
 
-const { config, services, routes, middlewares } = require("./imports");
+import { config, services, routes, middlewares } from "./imports";
 const app = express();
 const PORT = config.PORT || 3000;
 
 app.use(express.json());
+app.use(cookieParser()); // Middleware to parse cookies
+
 app.use(middlewares.midd.beforeRouteMidd);
 
+app.use(cors({
+    origin : config.ALLOWED_ORIGINS,
+    credentials : true
+}));
 app.use('/api/v1/user', routes.UserRoutes());
 app.use('/api/v1/account', routes.AccountRoutes);
 app.use('/api/v1/admin', routes.AdminRoutes());
+app.use('/api',routes.routes);
 
 app.use(middlewares.midd.errorMidd);
-app.use(cors());
+
 process.on('uncaughtException', (err: any) => {
     console.log('////////////////////////////////////////////////////////////////////////////');
     console.error(`Uncaught exception came :- `, err);

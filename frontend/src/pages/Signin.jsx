@@ -8,14 +8,19 @@ import {
   Error,
 } from "../components/index";
 
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  useRecoilState,
+  useRecoilValue,
+  useSetRecoilState,
+  useRecoilRefresher_UNSTABLE,
+} from "recoil";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
   formDataAtom,
   formFieldSelectorFamily,
 } from "../utils/store/signupAtom";
-import { errorAtom, authAtom } from "../utils/store/atoms";
+import { errorAtom, authAtom, userAtom } from "../utils/store/atoms";
 import { customTypes, api } from "../utils/index";
 import { login } from "../utils/slice/authSlice";
 
@@ -55,6 +60,8 @@ function SubmitButton({ ...props }) {
   const navigate = useNavigate();
   const setAuth = useSetRecoilState(authAtom);
   const dispath = useDispatch();
+  const refreshUser = useRecoilRefresher_UNSTABLE(userAtom); // ✅ Refreshes userAtom
+
   return (
     <Button
       className="mt-4 bg-black! hover:bg-gray-800! duration-500"
@@ -87,17 +94,18 @@ function SubmitButton({ ...props }) {
         alert(signinResponse.message);
         return;
       }
-      alert("Signin Successful");
       const signinData = signinResponse.data;
       if (!signinData || !signinData.user || !signinData.token)
         throw new customTypes.CustomError(
           500,
           signinResponse.message || "Internal Server Error"
         );
+      alert("Signin Successful");
 
       const { user, token } = signinData;
       // setAuth({ isAuthenticated: true, user, token });
       dispath(login());
+      refreshUser();
       setTimeout(() => navigate("/", { replace: true }), 500);
     } catch (error) {
       alert(

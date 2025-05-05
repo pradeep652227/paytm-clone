@@ -30,10 +30,10 @@ const TransactionSchema = new Schema({
         enum: Object.values(TxnTypes),
         required: true
     },
-    txnMode : {
-        type : String,
-        enum : Object.values(TxnModes),
-        required : true
+    txnMode: {
+        type: String,
+        enum: Object.values(TxnModes),
+        required: true
     },
     txnId: {
         type: Number,

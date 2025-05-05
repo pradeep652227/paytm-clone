@@ -31,6 +31,9 @@ export const Transfer = async (req: CustomTypes.AuthenticatedRequest, res: Respo
         if (!toUserId || !amount || amount <= 0)
             throw new CustomTypes.CustomError('Required fields are missing!!', 401, null);
 
+        if(userId == toUserId)
+            throw new CustomTypes.CustomError('Can not transfer to same account!!', 400);
+        
         const fromAccount = await Account.findOne({ User: userId }).session(session);
         if (!fromAccount)
             throw new CustomTypes.CustomError('Account not found', 404, null);
@@ -48,7 +51,8 @@ export const Transfer = async (req: CustomTypes.AuthenticatedRequest, res: Respo
             User: fromAccount.User,
             amount: amount,
             currentBalance: fromAccount.balance,
-            txnType: CustomTypes.TxnTypes.DEBIT
+            txnType: CustomTypes.TxnTypes.DEBIT,
+            txnMode : CustomTypes.TxnModes.TRANSFER
         });
         fromAccountTransaction.$session(session);
 
@@ -56,7 +60,8 @@ export const Transfer = async (req: CustomTypes.AuthenticatedRequest, res: Respo
             User: toAccount.User,
             amount: amount,
             currentBalance: toAccount.balance,
-            txnType: CustomTypes.TxnTypes.CREDIT
+            txnType: CustomTypes.TxnTypes.CREDIT,
+            txnMode : CustomTypes.TxnModes.TRANSFER
         });
         toAccountTransaction.$session(session);// ✅ Bind session
 

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+export const mongoose = require('mongoose');
 // const configObj = require('../config/config').default;
 import configObj from '../config/config';
 
@@ -21,7 +21,4 @@ const connectDB = () => {
     }
 }
 
-module.exports = {
-    connect : connectDB(),
-    mongoose
-}
+export const connect = connectDB();
