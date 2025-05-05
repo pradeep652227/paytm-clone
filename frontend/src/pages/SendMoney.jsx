@@ -1,7 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useLocation, useNavigate } from "react-router-dom";
 import { useRef } from "react";
-import { useRecoilValue, useSetRecoilState, useRecoilRefresher_UNSTABLE } from "recoil";
+import {
+  useRecoilValue,
+  useSetRecoilState,
+  useRecoilRefresher_UNSTABLE,
+} from "recoil";
 import {
   Button,
   Input,
@@ -20,7 +24,7 @@ export default function SendMoney() {
   const navigate = useNavigate();
 
   const amountRef = useRef();
-  
+
   const resetUser = useSetRecoilState(resetUserSelector);
   const refreshUser = useRecoilRefresher_UNSTABLE(userAtom); // ✅ Refreshes userAtom
 
@@ -50,34 +54,43 @@ export default function SendMoney() {
             className="w-full!"
             ref={amountRef}
           />
-          <Button label="Initiate Transfer" className="bg-green-400! w-full!" onClick={handleSubmit} />
+          <Button
+            label="Initiate Transfer"
+            className="bg-green-400! w-full!"
+            onClick={handleSubmit}
+          />
         </div>
       </div>
     </div>
   );
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    const currentAmount = amountRef.current?.value;
-    if (!currentAmount) {
-      alert("Please enter a valid amount to continue");
+    try {
+      e.preventDefault();
+      const currentAmount = amountRef.current?.value;
+      if (!currentAmount) {
+        alert("Please enter a valid amount to continue");
+        return;
+      }
+      if (!userId) {
+        alert("No target user set");
+        return;
+      }
+      const apiResponse = await api.post("/api/v1/account/transfer", {
+        toUserId: userId,
+        amount: currentAmount,
+      });
+      const apiData = apiResponse.data;
+      if (!apiData.status) {
+        alert("Payment can not be transfered due to " + apiData.message);
+        return;
+      }
+      alert("Amount transferred successfully!!");
+      refreshUser();
+      setTimeout(() => navigate("/", { replace: true }), 500);
+    } catch (error) {
+      alert("Payment can not be transfered due to :- " + error?.response?.data?.message || "");
       return;
     }
-    if (!userId) {
-      alert("No target user set");
-      return;
-    }
-    const apiResponse = await api.post("/api/v1/account/transfer", {
-      toUserId: userId,
-      amount: currentAmount,
-    });
-    const apiData = apiResponse.data;
-    if (!apiData.status) {
-      alert("Payment can not be transfered due to " + apiData.message);
-      return;
-    }
-    alert("Amount transferred successfully!!");
-    refreshUser();
-    setTimeout(() => navigate("/", { replace: true }), 500);
   }
 }

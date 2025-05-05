@@ -1,7 +1,4 @@
-import * as middlewares from './middlewares/index';
-module.exports = {
-    config : require('./config/config'),
-    services : require('./services/index'),
-    routes : require('./routes/index'),
-    middlewares
-}
+export * as middlewares from './middlewares/index';
+export {default as config} from './config/config';
+export * as services from './services/index';
+export * as routes from './routes/index';

@@ -9,10 +9,9 @@ import "./index.css";
 import { store, persistor } from "./utils/store/reduxStore.js";
 ReactDOM.createRoot(document.getElementById("root")).render(
   
-    <ErrorBoundary>
+   
       <Provider store={store}>
         <App />
       </Provider>
-    </ErrorBoundary>
 
 );

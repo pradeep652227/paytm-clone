@@ -1,3 +1,1 @@
-module.exports = {
-    db : require('./db')
-}
+export * as db from './db';

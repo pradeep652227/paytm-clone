@@ -2,7 +2,6 @@ import * as UserController from '../controllers/userController';
 import { Router, Request, Response } from 'express';
 import authMidd from '../middlewares/authMidd';
 
-
 export default function () {
     const router = Router();
 
@@ -13,10 +12,10 @@ export default function () {
 
     //Authenticated Routes
     router.use(authMidd);
-    router.get('/:id?', UserController.getUser);
+    router.get('/all?', UserController.getUsers);
     router.post('/update', UserController.updateUser);
-
-    console.log(`🚀 ~ userRoutes.ts:19 ~ router: `);
+    router.get('/signout',UserController.signout);
+    router.get('/:id?', UserController.getUser);
     return router;
 
 }
