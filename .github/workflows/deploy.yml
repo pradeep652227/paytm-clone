@@ -33,8 +33,8 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd paytm-clone/backend
-            git pull origin main
+            cd paytm-clone/backend/
+            git pull
             npm install
             npm run build
             pm2 restart paytm-clone || pm2 start dist/server.js --name paytm-clone-backend
