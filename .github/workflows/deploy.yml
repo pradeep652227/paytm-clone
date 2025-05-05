@@ -36,6 +36,8 @@ jobs:
                 export NVM_DIR="$HOME/.nvm"
                 source "$NVM_DIR/nvm.sh"
                 nvm use 22.15.0 
+
+                cd paytm-clone/backend
                 
                 npm install
                 npm run build
