@@ -33,3 +33,4 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: ./scripts/deploy.sh
+          
